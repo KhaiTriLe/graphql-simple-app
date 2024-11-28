@@ -20,11 +20,37 @@ var schema = buildSchema(`
     updateUser(id: ID!, name: String, email: String): User
     }
     `);// The root provides a resolver function for each API endpoint
-var root = {
-hello() {
-return "Hello world!"
-},
-}
+    var users = [];
+    var idCounter = 1;
+    var root = {
+    hello() {
+    return "Hello world!";
+    },
+    createUser({ name, email }) {
+    const user = { id: idCounter++, name, email };
+    users.push(user);
+    return user;
+    },
+    updateUser({ id, name, email }) {
+    const user = users.find((user) => user.id == id);
+    if (!user) {
+    throw new Error("User not found");
+    }
+    if (name) {
+    user.name = name;
+    }
+    if (email) {
+    user.email = email;
+    }
+    return user;
+    },
+    getUser({ id }) {
+    return users.find((user) => user.id == id);
+    },
+    getUsers() {
+    return users;
+    },
+    };
 var app = express()
 // Create and use the GraphQL handler.
 app.all(
